@@ -1,4 +1,4 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { PetsService } from './pets.service';
 import { Pet } from './models/pet.model';
 import { CreatePetInput } from './dto/create-pet.input';
@@ -15,7 +15,6 @@ export class PetsResolver {
   @Mutation(() => Pet)
   async createPet(@Args('createPetInput') createPetInput: CreatePetInput) {
     const user = await this.usersService.findOne(createPetInput.ownerId);
-    console.log('USER', user);
 
     if (!user) {
       throw new Error('User not found');
@@ -24,22 +23,22 @@ export class PetsResolver {
   }
 
   @Query(() => [Pet], { name: 'pets' })
-  findAll() {
+  async findAll() {
     return this.petsService.findAll();
   }
 
   @Query(() => Pet, { name: 'pet' })
-  findOne(@Args('id', { type: () => Int }) id: number) {
+  async findOne(@Args('id') id: string) {
     return this.petsService.findOne(id);
   }
 
   @Mutation(() => Pet)
-  updatePet(@Args('updatePetInput') updatePetInput: UpdatePetInput) {
+  async updatePet(@Args('updatePetInput') updatePetInput: UpdatePetInput) {
     return this.petsService.update(updatePetInput.id, updatePetInput);
   }
 
   @Mutation(() => Pet)
-  removePet(@Args('id', { type: () => Int }) id: number) {
+  async removePet(@Args('id') id: string) {
     return this.petsService.remove(id);
   }
 }
