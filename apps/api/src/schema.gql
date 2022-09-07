@@ -23,6 +23,7 @@ type Mutation {
 type Pet {
   id: ID!
   name: String!
+  owner: User!
   ownerId: String!
 }
 

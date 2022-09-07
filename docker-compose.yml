@@ -1,0 +1,16 @@
+services:
+  pets-api-db:
+    image: postgres
+    container_name: pets-api-db
+    environment:
+      POSTGRES_DB: pet-shop
+      POSTGRES_USER: petshop
+      POSTGRES_PASSWORD: petshop
+    volumes:
+      - pets-api-db:/var/lib/postgresql/data
+    ports:
+      - 5435:5432
+    restart: unless-stopped
+
+volumes:
+  pets-api-db:

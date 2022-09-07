@@ -30,7 +30,7 @@ export class PetsService {
   async update(id: string, updatePetInput: UpdatePetInput): Promise<Pet> {
     const pet = await this.findOne(id);
     await this.petRepository.update(id, updatePetInput);
-    return pet;
+    return { ...pet, ...updatePetInput };
   }
 
   async remove(id: string): Promise<Pet> {

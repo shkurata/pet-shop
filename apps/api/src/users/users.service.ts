@@ -30,7 +30,7 @@ export class UsersService {
   async update(id: string, updateUserInput: UpdateUserInput): Promise<User> {
     const user = await this.findOne(id);
     await this.userRepository.update(id, updateUserInput);
-    return user;
+    return { ...user, ...updateUserInput };
   }
 
   async remove(id: string): Promise<User> {
