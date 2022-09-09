@@ -9,7 +9,8 @@ import { PetsService } from './pets.service';
 
 const user: User = {
   id: '100',
-  name: 'Test User',
+  username: 'test_user',
+  password: 'password',
 };
 
 const pet: Pet = {

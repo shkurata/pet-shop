@@ -10,7 +10,8 @@ type MockType<T> = {
 
 const user: User = {
   id: '100',
-  name: 'Test User',
+  username: 'test_user',
+  password: 'password',
 };
 
 describe('UsersService', () => {
@@ -46,7 +47,9 @@ describe('UsersService', () => {
       userRepositoryMock.save.mockReturnValue(user);
       const newUser = await service.create(user);
       expect(newUser).toMatchObject(user);
-      expect(userRepositoryMock.save).toHaveBeenCalledWith(user);
+      expect(userRepositoryMock.save).toHaveBeenCalledWith(
+        expect.objectContaining({ id: '100', username: 'test_user' })
+      );
     });
   });
 
@@ -98,6 +101,24 @@ describe('UsersService', () => {
         id: user.id,
       });
       expect(userRepositoryMock.delete).toHaveBeenCalledWith({ id: user.id });
+    });
+  });
+
+  describe('findByUsername', () => {
+    it('should return a user', async () => {
+      userRepositoryMock.findOneBy.mockReturnValue(user);
+      const foundUser = await service.findByUsername(user.username);
+      expect(foundUser).toMatchObject(user);
+      expect(userRepositoryMock.findOneBy).toHaveBeenCalledWith({
+        username: user.username,
+      });
+    });
+
+    it('should throw an error if user is not found', async () => {
+      userRepositoryMock.findOneBy.mockReturnValue(null);
+      await expect(
+        service.findByUsername(user.username)
+      ).rejects.toThrowError();
     });
   });
 });

@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { config } from 'dotenv';
+import { AuthModule } from '../auth/auth.module';
 import { PetsModule } from '../pets/pets.module';
 import { UsersModule } from '../users/users.module';
 
@@ -24,12 +25,13 @@ config();
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
-      include: [PetsModule, UsersModule],
+      include: [PetsModule, UsersModule, AuthModule],
       autoSchemaFile: './apps/api/src/schema.gql',
       sortSchema: true,
     }),
     PetsModule,
     UsersModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

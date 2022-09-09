@@ -12,8 +12,11 @@ import { CreatePetInput } from './dto/create-pet.input';
 import { UpdatePetInput } from './dto/update-pet.input';
 import { UsersService } from '../users/users.service';
 import { User } from '../users/models/user.model';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { UseGuards } from '@nestjs/common';
 
 @Resolver(() => Pet)
+@UseGuards(JwtAuthGuard)
 export class PetsResolver {
   constructor(
     private readonly petsService: PetsService,

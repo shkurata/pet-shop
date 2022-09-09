@@ -5,6 +5,7 @@ import { randomUUID } from 'crypto';
 import * as request from 'supertest';
 import { Repository } from 'typeorm';
 import { AppModule } from '../app/app.module';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { User } from './models/user.model';
 
 describe('UserResolver (e2e)', () => {
@@ -27,7 +28,12 @@ describe('UserResolver (e2e)', () => {
         TypeOrmModule.forFeature([User]),
         AppModule,
       ],
-    }).compile();
+    })
+      .overrideGuard(JwtAuthGuard)
+      .useValue({
+        canActivate: () => true,
+      })
+      .compile();
 
     app = moduleFixture.createNestApplication();
     await app.init();
@@ -36,7 +42,8 @@ describe('UserResolver (e2e)', () => {
 
   beforeEach(async () => {
     user = await usersRepository.save({
-      name: 'Test User',
+      username: 'test_user',
+      password: 'password',
     });
   });
 
@@ -55,15 +62,15 @@ describe('UserResolver (e2e)', () => {
         .send({
           query: `
             mutation {
-                createUser(createUserInput: { name: "Test User 2" }) {
-                    name
+                createUser(createUserInput: { username: "test_user_2", password: "password" }) {
+                    username
                 }
             }
         `,
         })
         .expect(200)
         .expect(({ body }) => {
-          expect(body.data.createUser.name).toEqual('Test User 2');
+          expect(body.data.createUser.username).toEqual('test_user_2');
         }));
   });
 
@@ -75,14 +82,14 @@ describe('UserResolver (e2e)', () => {
           query: `
             query {
                 users {
-                    name
+                    username
                 }
             }
         `,
         })
         .expect(200)
         .expect(({ body }) => {
-          expect(body.data.users).toEqual([{ name: 'Test User' }]);
+          expect(body.data.users).toEqual([{ username: 'test_user' }]);
         }));
   });
 
@@ -94,14 +101,14 @@ describe('UserResolver (e2e)', () => {
           query: `
             query {
                 user(id: "${user.id}") {
-                    name
+                    username
                 }
             }
         `,
         })
         .expect(200)
         .expect(({ body }) => {
-          expect(body.data.user.name).toEqual('Test User');
+          expect(body.data.user.username).toEqual('test_user');
         }));
 
     it('should return an error if user not found', async () =>
@@ -111,7 +118,7 @@ describe('UserResolver (e2e)', () => {
           query: `
             query {
                 user(id: "${randomUUID()}") {
-                    name
+                    username
                 }
             }
         `,
@@ -129,15 +136,15 @@ describe('UserResolver (e2e)', () => {
         .send({
           query: `
             mutation {
-                updateUser(updateUserInput: { id: "${user.id}", name: "Test User 2" }) {
-                    name
+                updateUser(updateUserInput: { id: "${user.id}", username: "test_user_2" }) {
+                    username
                 }
             }
         `,
         })
         .expect(200)
         .expect(({ body }) => {
-          expect(body.data.updateUser.name).toEqual('Test User 2');
+          expect(body.data.updateUser.username).toEqual('test_user_2');
         }));
   });
 
@@ -149,14 +156,14 @@ describe('UserResolver (e2e)', () => {
           query: `
             mutation {
                 removeUser(id: "${user.id}") {
-                    name
+                    username
                 }
             }
         `,
         })
         .expect(200)
         .expect(async ({ body }) => {
-          expect(body.data.removeUser).toEqual({ name: 'Test User' });
+          expect(body.data.removeUser).toEqual({ username: 'test_user' });
           expect(await usersRepository.find()).toHaveLength(0);
         }));
   });

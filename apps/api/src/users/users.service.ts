@@ -1,18 +1,22 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
 import { CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
 import { User } from './models/user.model';
-
+import { hash } from 'bcrypt';
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>
   ) {}
 
-  create(createUserInput: CreateUserInput): Promise<User> {
-    return this.userRepository.save(createUserInput);
+  async create(createUserInput: CreateUserInput): Promise<User> {
+    const password = await hash(createUserInput.password, 10);
+    return this.userRepository.save({
+      ...createUserInput,
+      password,
+    });
   }
 
   async findAll(): Promise<User[]> {
@@ -20,7 +24,15 @@ export class UsersService {
   }
 
   async findOne(id: string): Promise<User> {
-    const user = await this.userRepository.findOneBy({ id });
+    return this.findOneBy({ id });
+  }
+
+  async findByUsername(username: string): Promise<User> {
+    return this.findOneBy({ username });
+  }
+
+  async findOneBy(options: FindOptionsWhere<User>): Promise<User> {
+    const user = this.userRepository.findOneBy(options);
     if (!user) {
       throw new Error('User not found');
     }
