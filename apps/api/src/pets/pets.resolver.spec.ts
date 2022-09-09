@@ -1,6 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { User } from '../users/models/user.model';
-import { UsersService } from '../users/users.service';
 import { CreatePetInput } from './dto/create-pet.input';
 import { UpdatePetInput } from './dto/update-pet.input';
 import { Pet } from './models/pet.model';
@@ -9,13 +8,14 @@ import { PetsService } from './pets.service';
 
 const user: User = {
   id: '100',
-  name: 'Test User',
+  username: 'test_user',
+  password: 'password',
 };
 
 const pet: Pet = {
   id: '1',
   name: 'Test Pet',
-  ownerId: user.id,
+  owner: user,
 };
 
 describe('PetsResolver', () => {
@@ -42,12 +42,6 @@ describe('PetsResolver', () => {
             remove: jest.fn((id: string) => ({ ...pet, id })),
           }),
         },
-        {
-          provide: UsersService,
-          useFactory: () => ({
-            findOne: jest.fn((id: string) => ({ ...user, id })),
-          }),
-        },
       ],
     }).compile();
 
@@ -67,7 +61,8 @@ describe('PetsResolver', () => {
       expect(newPet).toEqual({
         id: '1',
         name: 'Test Pet',
-        ownerId: '100',
+        owner: user,
+        ownerId: user.id,
       });
     });
   });
@@ -85,7 +80,7 @@ describe('PetsResolver', () => {
       expect(pet).toEqual({
         id: '1',
         name: 'Test Pet',
-        ownerId: '100',
+        owner: user,
       });
     });
   });
@@ -100,7 +95,8 @@ describe('PetsResolver', () => {
       expect(updatedPet).toEqual({
         id: '1',
         name: 'Updated Pet',
-        ownerId: '100',
+        owner: user,
+        ownerId: user.id,
       });
     });
   });
@@ -111,7 +107,7 @@ describe('PetsResolver', () => {
       expect(removedPet).toEqual({
         id: '1',
         name: 'Test Pet',
-        ownerId: '100',
+        owner: user,
       });
     });
   });

@@ -7,8 +7,9 @@ import { Pet } from './models/pet.model';
 import { AppModule } from '../app/app.module';
 import { Repository } from 'typeorm';
 import { randomUUID } from 'crypto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
-describe('PetsController (e2e)', () => {
+describe('PetsResolver (e2e)', () => {
   let app: INestApplication;
   let petsRepository: Repository<Pet>;
   let usersRepository: Repository<User>;
@@ -30,7 +31,12 @@ describe('PetsController (e2e)', () => {
         TypeOrmModule.forFeature([User, Pet]),
         AppModule,
       ],
-    }).compile();
+    })
+      .overrideGuard(JwtAuthGuard)
+      .useValue({
+        canActivate: () => true,
+      })
+      .compile();
 
     app = moduleFixture.createNestApplication();
     await app.init();
@@ -40,11 +46,12 @@ describe('PetsController (e2e)', () => {
 
   beforeEach(async () => {
     user = await usersRepository.save({
-      name: 'Test User',
+      username: 'test_user',
+      password: 'password',
     });
     pet = await petsRepository.save({
       name: 'Test Pet 1',
-      ownerId: user.id,
+      owner: user,
     });
   });
 
@@ -70,7 +77,9 @@ describe('PetsController (e2e)', () => {
               }) {
                 id
                 name
-                ownerId
+                owner {
+                  id
+                }
               }
             }
           `,
@@ -80,10 +89,35 @@ describe('PetsController (e2e)', () => {
           expect(body.data.createPet).toEqual({
             id: expect.any(String),
             name: 'Test Pet 2',
-            ownerId: user.id,
+            owner: { id: user.id },
           });
           const pets = await petsRepository.find();
           expect(pets).toHaveLength(2);
+        }));
+
+    it('should throw an error if the owner does not exist', async () =>
+      request(app.getHttpServer())
+        .post(gql)
+        .send({
+          query: `
+            mutation {
+              createPet(createPetInput: {
+                name: "Test Pet 2",
+                ownerId: "${randomUUID()}",
+              }) {
+                id
+                name
+                owner {
+                  id
+                }
+              }
+            }
+          `,
+        })
+        .expect(200)
+        .expect(({ body }) => {
+          expect(body.errors).toHaveLength(1);
+          expect(body.errors[0].message).toEqual('User not found');
         }));
   });
 
@@ -99,7 +133,7 @@ describe('PetsController (e2e)', () => {
                 name
                 owner {
                   id
-                  name
+                  username
                 }
               }
             }
@@ -113,7 +147,7 @@ describe('PetsController (e2e)', () => {
               name: pet.name,
               owner: {
                 id: user.id,
-                name: user.name,
+                username: user.username,
               },
             },
           ]);
@@ -133,7 +167,7 @@ describe('PetsController (e2e)', () => {
                 name
                 owner {
                   id
-                  name
+                  username
                 }
               }
             }
@@ -146,7 +180,7 @@ describe('PetsController (e2e)', () => {
             name: pet.name,
             owner: {
               id: user.id,
-              name: user.name,
+              username: user.username,
             },
           });
         }));
@@ -162,7 +196,7 @@ describe('PetsController (e2e)', () => {
               name
               owner {
                 id
-                name
+                username
               }
             }
           }

@@ -5,7 +5,8 @@ import { UsersService } from './users.service';
 
 const user: User = {
   id: '100',
-  name: 'Test User',
+  username: 'test_user',
+  password: 'password',
 };
 
 describe('UsersResolver', () => {
@@ -44,10 +45,14 @@ describe('UsersResolver', () => {
 
   describe('createUser', () => {
     it('should create a user', async () => {
-      const result = await resolver.createUser({ name: 'Test User' });
+      const result = await resolver.createUser({
+        username: 'test_user',
+        password: 'password',
+      });
       expect(result).toEqual({
         id: '100',
-        name: 'Test User',
+        username: 'test_user',
+        password: 'password',
       });
     });
   });
@@ -64,7 +69,8 @@ describe('UsersResolver', () => {
       const result = await resolver.findOne('100');
       expect(result).toEqual({
         id: '100',
-        name: 'Test User',
+        username: 'test_user',
+        password: 'password',
       });
     });
   });
@@ -73,11 +79,12 @@ describe('UsersResolver', () => {
     it('should update a user', async () => {
       const result = await resolver.updateUser({
         id: '100',
-        name: 'Test User',
+        username: 'test_user',
       });
       expect(result).toEqual({
         id: '100',
-        name: 'Test User',
+        username: 'test_user',
+        password: 'password',
       });
     });
   });
@@ -87,7 +94,8 @@ describe('UsersResolver', () => {
       const result = await resolver.removeUser('100');
       expect(result).toEqual({
         id: '100',
-        name: 'Test User',
+        username: 'test_user',
+        password: 'password',
       });
     });
   });
