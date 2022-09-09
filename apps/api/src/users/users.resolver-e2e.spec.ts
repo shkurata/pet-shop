@@ -6,6 +6,7 @@ import * as request from 'supertest';
 import { Repository } from 'typeorm';
 import { AppModule } from '../app/app.module';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { Pet } from '../pets/models/pet.model';
 import { User } from './models/user.model';
 
 describe('UserResolver (e2e)', () => {
@@ -20,12 +21,12 @@ describe('UserResolver (e2e)', () => {
         TypeOrmModule.forRoot({
           type: 'better-sqlite3',
           database: ':memory:',
-          entities: [User],
+          entities: [User, Pet],
           logging: false,
           synchronize: true,
           dropSchema: true,
         }),
-        TypeOrmModule.forFeature([User]),
+        TypeOrmModule.forFeature([User, Pet]),
         AppModule,
       ],
     })

@@ -28,6 +28,7 @@ config();
       include: [PetsModule, UsersModule, AuthModule],
       autoSchemaFile: './apps/api/src/schema.gql',
       sortSchema: true,
+      debug: true,
     }),
     PetsModule,
     UsersModule,

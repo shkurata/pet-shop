@@ -37,7 +37,6 @@ type Pet {
   id: ID!
   name: String!
   owner: User!
-  ownerId: String!
 }
 
 type Query {
@@ -55,6 +54,7 @@ input UpdatePetInput {
 
 input UpdateUserInput {
   id: String!
+  name: String
   password: String
   username: String
 }
@@ -62,5 +62,6 @@ input UpdateUserInput {
 type User {
   id: ID!
   name: String
+  pets: [Pet!]
   username: String!
 }

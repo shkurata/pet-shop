@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { UsersService } from '../users/users.service';
 import { CreatePetInput } from './dto/create-pet.input';
 import { UpdatePetInput } from './dto/update-pet.input';
 import { Pet } from './models/pet.model';
@@ -8,19 +9,29 @@ import { Pet } from './models/pet.model';
 @Injectable()
 export class PetsService {
   constructor(
-    @InjectRepository(Pet) private readonly petRepository: Repository<Pet>
+    @InjectRepository(Pet) private readonly petRepository: Repository<Pet>,
+    private readonly usersService: UsersService
   ) {}
 
-  create(createPetInput: CreatePetInput): Promise<Pet> {
-    return this.petRepository.save(createPetInput);
+  async create(createPetInput: CreatePetInput): Promise<Pet> {
+    const user = await this.usersService.findOne(createPetInput.ownerId);
+    if (!user) {
+      throw new Error('User not found');
+    }
+    return this.petRepository.save({ ...createPetInput, owner: user });
   }
 
   findAll(): Promise<Pet[]> {
-    return this.petRepository.find();
+    return this.petRepository.find({
+      relations: ['owner'],
+    });
   }
 
   async findOne(id: string): Promise<Pet> {
-    const pet = await this.petRepository.findOneBy({ id });
+    const pet = await this.petRepository.findOne({
+      where: { id },
+      relations: ['owner'],
+    });
     if (!pet) {
       throw new Error('Pet not found');
     }

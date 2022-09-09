@@ -1,5 +1,12 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql';
-import { Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm';
+import {
+  Column,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  Unique,
+} from 'typeorm';
+import { Pet } from '../../pets/models/pet.model';
 
 @Entity()
 @Unique(['username'])
@@ -19,4 +26,8 @@ export class User {
   @Column()
   @Field(() => String)
   username: string;
+
+  @OneToMany(() => Pet, (pet) => pet.owner)
+  @Field(() => [Pet], { nullable: true })
+  pets?: Pet[];
 }

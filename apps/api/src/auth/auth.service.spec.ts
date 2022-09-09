@@ -54,7 +54,6 @@ describe('AuthService', () => {
         password: 'password',
       });
       expect(result.username).toEqual('test_user');
-      expect(await bcrypt.compare('password', result.password)).toBeTruthy();
     });
   });
 

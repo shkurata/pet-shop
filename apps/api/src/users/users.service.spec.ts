@@ -18,7 +18,7 @@ describe('UsersService', () => {
   let service: UsersService;
   const userRepositoryMock: MockType<Repository<User>> = {
     find: jest.fn(),
-    findOneBy: jest.fn(),
+    findOne: jest.fn(),
     save: jest.fn(),
     update: jest.fn(),
     delete: jest.fn(),
@@ -64,28 +64,30 @@ describe('UsersService', () => {
 
   describe('findOne', () => {
     it('should return a user', async () => {
-      userRepositoryMock.findOneBy.mockReturnValue(user);
+      userRepositoryMock.findOne.mockReturnValue(user);
       const foundUser = await service.findOne(user.id);
       expect(foundUser).toMatchObject(user);
-      expect(userRepositoryMock.findOneBy).toHaveBeenCalledWith({
-        id: user.id,
+      expect(userRepositoryMock.findOne).toHaveBeenCalledWith({
+        relations: ['pets'],
+        where: { id: user.id },
       });
     });
 
     it('should throw an error if user is not found', async () => {
-      userRepositoryMock.findOneBy.mockReturnValue(null);
+      userRepositoryMock.findOne.mockReturnValue(null);
       await expect(service.findOne(user.id)).rejects.toThrowError();
     });
   });
 
   describe('update', () => {
     it('should update a user', async () => {
-      userRepositoryMock.findOneBy.mockReturnValue(user);
+      userRepositoryMock.findOne.mockReturnValue(user);
       userRepositoryMock.update.mockReturnValue(user);
       const updatedUser = await service.update(user.id, user);
       expect(updatedUser).toMatchObject(user);
-      expect(userRepositoryMock.findOneBy).toHaveBeenCalledWith({
-        id: user.id,
+      expect(userRepositoryMock.findOne).toHaveBeenCalledWith({
+        relations: ['pets'],
+        where: { id: user.id },
       });
       expect(userRepositoryMock.update).toHaveBeenCalledWith(user.id, user);
     });
@@ -93,12 +95,13 @@ describe('UsersService', () => {
 
   describe('remove', () => {
     it('should delete a user', async () => {
-      userRepositoryMock.findOneBy.mockReturnValue(user);
+      userRepositoryMock.findOne.mockReturnValue(user);
       userRepositoryMock.delete.mockReturnValue(user);
       const deletedUser = await service.remove(user.id);
       expect(deletedUser).toMatchObject(user);
-      expect(userRepositoryMock.findOneBy).toHaveBeenCalledWith({
-        id: user.id,
+      expect(userRepositoryMock.findOne).toHaveBeenCalledWith({
+        relations: ['pets'],
+        where: { id: user.id },
       });
       expect(userRepositoryMock.delete).toHaveBeenCalledWith({ id: user.id });
     });
@@ -106,16 +109,17 @@ describe('UsersService', () => {
 
   describe('findByUsername', () => {
     it('should return a user', async () => {
-      userRepositoryMock.findOneBy.mockReturnValue(user);
+      userRepositoryMock.findOne.mockReturnValue(user);
       const foundUser = await service.findByUsername(user.username);
       expect(foundUser).toMatchObject(user);
-      expect(userRepositoryMock.findOneBy).toHaveBeenCalledWith({
-        username: user.username,
+      expect(userRepositoryMock.findOne).toHaveBeenCalledWith({
+        relations: ['pets'],
+        where: { id: user.id },
       });
     });
 
     it('should throw an error if user is not found', async () => {
-      userRepositoryMock.findOneBy.mockReturnValue(null);
+      userRepositoryMock.findOne.mockReturnValue(null);
       await expect(
         service.findByUsername(user.username)
       ).rejects.toThrowError();

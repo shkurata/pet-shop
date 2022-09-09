@@ -20,7 +20,7 @@ export class UsersService {
   }
 
   async findAll(): Promise<User[]> {
-    return this.userRepository.find();
+    return this.userRepository.find({ relations: ['pets'] });
   }
 
   async findOne(id: string): Promise<User> {
@@ -32,7 +32,10 @@ export class UsersService {
   }
 
   async findOneBy(options: FindOptionsWhere<User>): Promise<User> {
-    const user = this.userRepository.findOneBy(options);
+    const user = this.userRepository.findOne({
+      where: options,
+      relations: ['pets'],
+    });
     if (!user) {
       throw new Error('User not found');
     }

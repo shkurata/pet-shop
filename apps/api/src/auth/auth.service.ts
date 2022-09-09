@@ -33,7 +33,6 @@ export class AuthService {
   }
 
   async signup(loginUserInput: LoginUserInput): Promise<User> {
-    const password = await bcrypt.hash(loginUserInput.password, 10);
-    return this.usersService.create({ ...loginUserInput, password });
+    return this.usersService.create(loginUserInput);
   }
 }

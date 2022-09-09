@@ -51,7 +51,7 @@ describe('PetsResolver (e2e)', () => {
     });
     pet = await petsRepository.save({
       name: 'Test Pet 1',
-      ownerId: user.id,
+      owner: user,
     });
   });
 
@@ -77,7 +77,9 @@ describe('PetsResolver (e2e)', () => {
               }) {
                 id
                 name
-                ownerId
+                owner {
+                  id
+                }
               }
             }
           `,
@@ -87,7 +89,7 @@ describe('PetsResolver (e2e)', () => {
           expect(body.data.createPet).toEqual({
             id: expect.any(String),
             name: 'Test Pet 2',
-            ownerId: user.id,
+            owner: { id: user.id },
           });
           const pets = await petsRepository.find();
           expect(pets).toHaveLength(2);
@@ -105,7 +107,9 @@ describe('PetsResolver (e2e)', () => {
               }) {
                 id
                 name
-                ownerId
+                owner {
+                  id
+                }
               }
             }
           `,
