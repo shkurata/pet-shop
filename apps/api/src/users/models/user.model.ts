@@ -1,4 +1,5 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql';
+import { UserInterface } from '@pet-shop/data';
 import {
   Column,
   Entity,
@@ -11,7 +12,7 @@ import { Pet } from '../../pets/models/pet.model';
 @Entity()
 @Unique(['username'])
 @ObjectType()
-export class User {
+export class User implements UserInterface {
   @PrimaryGeneratedColumn('uuid')
   @Field(() => ID)
   id: string;

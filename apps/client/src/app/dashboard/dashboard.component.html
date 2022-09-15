@@ -1,0 +1,10 @@
+<h2>Dashboard</h2>
+<div *ngIf="user$ | async as user">
+  <p>Username: {{ user.username }}</p>
+  <p>Pets:</p>
+  <ul *ngIf="user.pets?.length">
+    <li *ngFor="let pet of user.pets">
+      {{ pet.name }}
+    </li>
+  </ul>
+</div>

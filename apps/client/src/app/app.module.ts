@@ -2,34 +2,30 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AppComponent } from './app.component';
-import { RouterModule } from '@angular/router';
+import { Route, RouterModule } from '@angular/router';
 import { LoginComponent } from './login/login.component';
-import { ApolloModule, APOLLO_OPTIONS } from 'apollo-angular';
-import { InMemoryCache } from '@apollo/client/core';
-import { HttpLink } from 'apollo-angular/http';
 import { HttpClientModule } from '@angular/common/http';
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { AuthGuard } from './guards/auth.guard';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { GraphQLModule } from './graphql.module';
 
+const routes: Route[] = [
+  { path: '', component: DashboardComponent, canActivate: [AuthGuard] },
+  {
+    path: 'login',
+    component: LoginComponent,
+  },
+];
 @NgModule({
-  declarations: [AppComponent, LoginComponent],
+  declarations: [AppComponent, LoginComponent, DashboardComponent],
   imports: [
+    FormsModule,
+    ReactiveFormsModule,
+    GraphQLModule,
     BrowserModule,
-    ApolloModule,
     HttpClientModule,
-    RouterModule.forRoot([], { initialNavigation: 'enabledBlocking' }),
-  ],
-  providers: [
-    {
-      provide: APOLLO_OPTIONS,
-      useFactory: (httpLink: HttpLink) => {
-        return {
-          cache: new InMemoryCache(),
-          link: httpLink.create({
-            uri: 'http://localhost:3333/graphql',
-          }),
-        };
-      },
-      deps: [HttpLink],
-    },
+    RouterModule.forRoot(routes, { initialNavigation: 'enabledBlocking' }),
   ],
   bootstrap: [AppComponent],
 })

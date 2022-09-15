@@ -5,6 +5,8 @@ import { CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { CurrentUser } from './user.decorator';
+import { UserContextPayload } from '@pet-shop/data';
 
 @Resolver(() => User)
 @UseGuards(JwtAuthGuard)
@@ -19,6 +21,11 @@ export class UsersResolver {
   @Query(() => [User], { name: 'users' })
   async findAll() {
     return this.usersService.findAll();
+  }
+
+  @Query(() => User, { name: 'me' })
+  findMe(@CurrentUser() user: UserContextPayload) {
+    return this.usersService.findOne(user.userId);
   }
 
   @Query(() => User, { name: 'user' })

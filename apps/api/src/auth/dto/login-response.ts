@@ -8,4 +8,7 @@ export class LoginResponse {
 
   @Field(() => User)
   user: Partial<User>;
+
+  @Field()
+  expires_in: string;
 }

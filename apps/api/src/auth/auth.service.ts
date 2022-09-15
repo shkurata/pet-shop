@@ -28,6 +28,7 @@ export class AuthService {
         username: user.username,
         sub: user.id,
       }),
+      expires_in: process.env.ACCESS_TOKEN_EXPIRATION,
       user,
     };
   }

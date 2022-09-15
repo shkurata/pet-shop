@@ -14,6 +14,7 @@ input CreateUserInput {
 
 type LoginResponse {
   access_token: String!
+  expires_in: String!
   user: User!
 }
 
@@ -40,6 +41,7 @@ type Pet {
 }
 
 type Query {
+  me: User!
   pet(id: String!): Pet!
   pets: [Pet!]!
   user(id: String!): User!

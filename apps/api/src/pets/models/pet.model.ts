@@ -1,10 +1,11 @@
-import { ObjectType, Field, ID } from '@nestjs/graphql';
+import { Field, ID, ObjectType } from '@nestjs/graphql';
+import { PetInterface, UserInterface } from '@pet-shop/data';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from '../../users/models/user.model';
 
 @Entity('pets')
 @ObjectType()
-export class Pet {
+export class Pet implements PetInterface {
   @PrimaryGeneratedColumn('uuid')
   @Field(() => ID)
   id: string;
@@ -15,5 +16,5 @@ export class Pet {
 
   @ManyToOne(() => User, (user) => user.pets)
   @Field(() => User)
-  owner: User;
+  owner: UserInterface;
 }
