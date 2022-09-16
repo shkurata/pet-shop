@@ -14,7 +14,9 @@ export class Pet implements PetInterface {
   @Field(() => String)
   name: string;
 
-  @ManyToOne(() => User, (user) => user.pets)
+  @ManyToOne(() => User, (user) => user.pets, {
+    onDelete: 'CASCADE',
+  })
   @Field(() => User)
   owner: UserInterface;
 }

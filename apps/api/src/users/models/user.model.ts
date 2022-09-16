@@ -28,7 +28,9 @@ export class User implements UserInterface {
   @Field(() => String)
   username: string;
 
-  @OneToMany(() => Pet, (pet) => pet.owner)
+  @OneToMany(() => Pet, (pet) => pet.owner, {
+    cascade: true,
+  })
   @Field(() => [Pet], { nullable: true })
   pets?: Pet[];
 }

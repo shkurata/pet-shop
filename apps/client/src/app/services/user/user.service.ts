@@ -40,7 +40,6 @@ export class UserService {
   }
 
   private errorHandler(error: ApolloError) {
-    console.log(error.graphQLErrors);
     this.authService.logout();
   }
 }
