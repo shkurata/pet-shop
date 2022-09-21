@@ -1,4 +1,5 @@
-import { INestApplication } from '@nestjs/common';
+import { ExecutionContext, INestApplication } from '@nestjs/common';
+import { GqlExecutionContext } from '@nestjs/graphql';
 import { TestingModule, Test } from '@nestjs/testing';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { randomUUID } from 'crypto';
@@ -32,7 +33,11 @@ describe('UserResolver (e2e)', () => {
     })
       .overrideGuard(JwtAuthGuard)
       .useValue({
-        canActivate: () => true,
+        canActivate: (context: ExecutionContext) => {
+          const ctx = GqlExecutionContext.create(context);
+          ctx.getContext().req.user = { isAdmin: true }; // Your user object
+          return true;
+        },
       })
       .compile();
 

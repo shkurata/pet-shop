@@ -1,4 +1,4 @@
-import { INestApplication } from '@nestjs/common';
+import { ExecutionContext, INestApplication } from '@nestjs/common';
 import { TestingModule, Test } from '@nestjs/testing';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as request from 'supertest';
@@ -8,6 +8,7 @@ import { AppModule } from '../app/app.module';
 import { Repository } from 'typeorm';
 import { randomUUID } from 'crypto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { GqlExecutionContext } from '@nestjs/graphql';
 
 describe('PetsResolver (e2e)', () => {
   let app: INestApplication;
@@ -34,7 +35,11 @@ describe('PetsResolver (e2e)', () => {
     })
       .overrideGuard(JwtAuthGuard)
       .useValue({
-        canActivate: () => true,
+        canActivate: (context: ExecutionContext) => {
+          const ctx = GqlExecutionContext.create(context);
+          ctx.getContext().req.user = { isAdmin: true }; // Your user object
+          return true;
+        },
       })
       .compile();
 

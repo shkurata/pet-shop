@@ -1,6 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { UserContextPayload } from '@pet-shop/data';
 import { Repository } from 'typeorm';
+import { AppAbility, CaslAbilityFactory } from '../casl/casl-ability.factory';
 import { User } from '../users/models/user.model';
 import { UsersService } from '../users/users.service';
 import { Pet } from './models/pet.model';
@@ -21,6 +23,7 @@ const pet: Pet = {
   name: 'Test Pet',
   owner: user,
 };
+let userAbility: AppAbility;
 
 describe('PetsService', () => {
   let service: PetsService;
@@ -36,6 +39,7 @@ describe('PetsService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         PetsService,
+        CaslAbilityFactory,
         {
           provide: getRepositoryToken(Pet),
           useValue: petRepositoryMock,
@@ -50,6 +54,12 @@ describe('PetsService', () => {
     }).compile();
 
     service = module.get<PetsService>(PetsService);
+    const caslAbilityFactory =
+      module.get<CaslAbilityFactory>(CaslAbilityFactory);
+    userAbility = caslAbilityFactory.createForUser({
+      isAdmin: true,
+      userId: '100',
+    } as UserContextPayload);
   });
 
   it('should be defined', () => {
@@ -116,7 +126,7 @@ describe('PetsService', () => {
     it('should remove a pet', async () => {
       petRepositoryMock.findOne.mockReturnValue(pet);
       petRepositoryMock.delete.mockReturnValue(pet);
-      const deletedPet = await service.remove(pet.id);
+      const deletedPet = await service.remove(pet.id, userAbility);
       expect(deletedPet).toMatchObject(pet);
       expect(petRepositoryMock.findOne).toHaveBeenCalledWith({
         where: { id: pet.id },

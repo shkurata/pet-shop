@@ -24,6 +24,10 @@ export class User implements UserInterface {
   @Column()
   password: string;
 
+  @Column({ nullable: true })
+  @Field(() => Boolean, { nullable: true })
+  isAdmin?: boolean;
+
   @Column()
   @Field(() => String)
   username: string;

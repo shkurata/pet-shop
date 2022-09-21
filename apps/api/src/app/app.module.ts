@@ -4,6 +4,7 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { config } from 'dotenv';
 import { AuthModule } from '../auth/auth.module';
+import { CaslModule } from '../casl/casl.module';
 import { PetsModule } from '../pets/pets.module';
 import { UsersModule } from '../users/users.module';
 
@@ -22,6 +23,7 @@ config();
       database: process.env.POSTGRES_DB,
       synchronize: true, // shouldn't be used in production - otherwise you can lose production data
       autoLoadEntities: true,
+      // logging: true,
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
@@ -33,6 +35,7 @@ config();
     PetsModule,
     UsersModule,
     AuthModule,
+    CaslModule,
   ],
   controllers: [AppController],
   providers: [AppService],

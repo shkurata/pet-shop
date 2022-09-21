@@ -63,6 +63,7 @@ input UpdateUserInput {
 
 type User {
   id: ID!
+  isAdmin: Boolean
   name: String
   pets: [Pet!]
   username: String!

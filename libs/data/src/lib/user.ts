@@ -4,9 +4,11 @@ export interface UserInterface {
   id: string;
   name?: string;
   email?: string;
+  isAdmin?: boolean;
   password: string;
   username: string;
   pets?: PetInterface[];
+  ability?: unknown;
 }
 
 export interface UserResultPayload {
@@ -20,4 +22,5 @@ export interface LoggedInUserPayload {
 export interface UserContextPayload {
   userId: string;
   username: string;
+  isAdmin: boolean;
 }

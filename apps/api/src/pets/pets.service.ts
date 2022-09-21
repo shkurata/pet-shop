@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Action } from '@pet-shop/data';
 import { Repository } from 'typeorm';
+import { AppAbility } from '../casl/casl-ability.factory';
 import { UsersService } from '../users/users.service';
 import { CreatePetInput } from './dto/create-pet.input';
 import { UpdatePetInput } from './dto/update-pet.input';
@@ -44,8 +46,11 @@ export class PetsService {
     return { ...pet, ...updatePetInput };
   }
 
-  async remove(id: string): Promise<Pet> {
+  async remove(id: string, ability: AppAbility): Promise<Pet> {
     const pet = await this.findOne(id);
+    if (ability.cannot(Action.Delete, pet)) {
+      throw new Error('Forbidden');
+    }
     await this.petRepository.delete({ id });
     return pet;
   }

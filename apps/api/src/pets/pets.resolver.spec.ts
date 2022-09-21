@@ -1,4 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { UserContextPayload } from '@pet-shop/data';
+import { AppAbility, CaslAbilityFactory } from '../casl/casl-ability.factory';
 import { User } from '../users/models/user.model';
 import { CreatePetInput } from './dto/create-pet.input';
 import { UpdatePetInput } from './dto/update-pet.input';
@@ -18,6 +20,8 @@ const pet: Pet = {
   owner: user,
 };
 
+let userAbility: AppAbility;
+
 describe('PetsResolver', () => {
   let resolver: PetsResolver;
 
@@ -25,6 +29,7 @@ describe('PetsResolver', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         PetsResolver,
+        CaslAbilityFactory,
         {
           provide: PetsService,
           useFactory: () => ({
@@ -46,6 +51,12 @@ describe('PetsResolver', () => {
     }).compile();
 
     resolver = module.get<PetsResolver>(PetsResolver);
+    const caslAbilityFactory =
+      module.get<CaslAbilityFactory>(CaslAbilityFactory);
+    userAbility = caslAbilityFactory.createForUser({
+      isAdmin: true,
+      userId: '100',
+    } as UserContextPayload);
   });
 
   it('should be defined', () => {
@@ -54,10 +65,14 @@ describe('PetsResolver', () => {
 
   describe('createPet', () => {
     it('should create a pet', async () => {
-      const newPet = await resolver.createPet({
-        name: 'Test Pet',
-        ownerId: user.id,
-      });
+      const newPet = await resolver.createPet(
+        {
+          name: 'Test Pet',
+          ownerId: user.id,
+        },
+        userAbility,
+        { userId: user.id } as UserContextPayload
+      );
       expect(newPet).toEqual({
         id: '1',
         name: 'Test Pet',
@@ -69,14 +84,14 @@ describe('PetsResolver', () => {
 
   describe('findAll', () => {
     it('should return an array of pets', async () => {
-      const pets = await resolver.findAll();
+      const pets = await resolver.findAll(userAbility);
       expect(pets).toEqual([pet]);
     });
   });
 
   describe('findOne', () => {
     it('should return a pet', async () => {
-      const pet = await resolver.findOne('1');
+      const pet = await resolver.findOne('1', userAbility);
       expect(pet).toEqual({
         id: '1',
         name: 'Test Pet',
@@ -87,11 +102,14 @@ describe('PetsResolver', () => {
 
   describe('updatePet', () => {
     it('should update a pet', async () => {
-      const updatedPet = await resolver.updatePet({
-        id: '1',
-        name: 'Updated Pet',
-        ownerId: user.id,
-      });
+      const updatedPet = await resolver.updatePet(
+        {
+          id: '1',
+          name: 'Updated Pet',
+          ownerId: user.id,
+        },
+        userAbility
+      );
       expect(updatedPet).toEqual({
         id: '1',
         name: 'Updated Pet',
@@ -103,7 +121,7 @@ describe('PetsResolver', () => {
 
   describe('removePet', () => {
     it('should remove a pet', async () => {
-      const removedPet = await resolver.removePet('1');
+      const removedPet = await resolver.removePet('1', userAbility);
       expect(removedPet).toEqual({
         id: '1',
         name: 'Test Pet',
